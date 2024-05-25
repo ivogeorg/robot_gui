@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   robotinfo_msgs
   roscpp
   std_srvs
+  OpenCV
 )
 
 ## System dependencies are found with CMake's conventions
@@ -105,9 +106,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES robot_gui
-#  CATKIN_DEPENDS geometry_msgs nav_msgs robotinfo_msgs roscpp std_srvs
+ INCLUDE_DIRS include
+ LIBRARIES robot_gui_lib
+#  LIBRARIES tiny_robot_gui_lib
+ CATKIN_DEPENDS geometry_msgs nav_msgs robotinfo_msgs roscpp std_srvs
 #  DEPENDS system_lib
 )
 
@@ -118,13 +120,17 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/robot_gui.cpp
+add_library(${PROJECT_NAME}_lib
+  src/robot_gui.cpp
+)
+# add_library(tiny_${PROJECT_NAME}_lib
+#   src/tiny_robot_gui.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -135,7 +141,17 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+
+# NOTE: For this executable declaration to work, specificically for the
+#       robot_gui.cpp source file to be listed explicitly, the lines
+#       #define CVUI_IMPLEMENTATION
+#       #include "robot_gui/cvui.h"
+#       have to be in robot_gui.cpp, not robot_gui.h, as the latter is
+#       included in both robot_gui.cpp and robot_gui_node.cpp.
+add_executable(${PROJECT_NAME}_node src/robot_gui.cpp src/robot_gui_node.cpp)
+
 # add_executable(${PROJECT_NAME}_node src/robot_gui_node.cpp)
+# add_executable(tiny_${PROJECT_NAME}_node src/tiny_robot_gui.cpp src/tiny_robot_gui_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -148,8 +164,15 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
+target_link_libraries(${PROJECT_NAME}_node
+  robot_gui_lib
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
+)
+# target_link_libraries(tiny_${PROJECT_NAME}_node
+#   tiny_robot_gui_lib
 #   ${catkin_LIBRARIES}
+#   ${OpenCV_LIBS}
 # )
 
 #############
