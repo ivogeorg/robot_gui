@@ -15,4 +15,4 @@ Teleop Buttons | Buttons | Pub `/cmd_vel` | By increments vertical/horizontal
 Current velocity | Window with title | Sub `/odom` | Linear `x`, angular `z`
 Robot position | Window with title | Sub `/odom` | Linear `x`, `y`, `z` separate
 Distance traveled | Trigger button + window with title | Service client | `/get_distance`
-Reset distance | Trigger button | Service client | _(Optional)__ `/reset_distance`
+Reset distance | Trigger button | Service client | _(Optional)_ `/reset_distance`
