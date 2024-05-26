@@ -137,6 +137,25 @@ void RobotGUI::run() {
     cvui::printf(frame, 165, 510, 0.4, vel_color, "%.02f rad/sec",
                  odom_data_.twist.twist.angular.z);
 
+    // Robot position (cvui-position)
+    int pos_color = 0xf0f0f0;
+    origin_x = 10;
+    origin_y = 530;
+    cvui::printf(frame, origin_x, origin_y + 15, 0.36, pos_color, "Estimated robot position from odometry (m)");
+    cvui::window(frame, origin_x, origin_y + 30, 90, 90, "X");
+    // Print the x coordinate from odometry
+    cvui::printf(frame, origin_x, origin_y + 90, 0.8, vel_color, "%*.02f", 6,
+                 odom_data_.pose.pose.position.x);
+    cvui::window(frame, origin_x + 95, origin_y + 30, 90, 90, "Y");
+    // Print the y coordinate from odometry
+    cvui::printf(frame, origin_x + 90, origin_y + 90, 0.8, vel_color, "%*.02f", 6,
+                 odom_data_.pose.pose.position.y);
+    cvui::window(frame, origin_x + 190, origin_y + 30, 90, 90, "Z");
+    // Print the z coordinate from odometry
+    cvui::printf(frame, origin_x + 185, origin_y + 90, 0.8, vel_color, "%*.02f", 6,
+                 odom_data_.pose.pose.position.z);
+
+
     // Update cvui internal stuff
     cvui::update();
 
