@@ -9,7 +9,6 @@
 #define CVUI_IMPLEMENTATION
 #include "robot_gui/cvui.h"
 
-
 #include <string>
 
 RobotGUI::RobotGUI(std::string into_topic, std::string odom_topic,
@@ -41,7 +40,8 @@ void RobotGUI::robot_info_callback(
     const robotinfo_msgs::RobotInfo10Fields::ConstPtr &robot_info_data) {
   robot_info_data_ = *robot_info_data;
   ROS_INFO_STREAM("Robot Control GUI: received robot info data");
-  ROS_INFO_STREAM("Robot Control GUI: data_field_01 = " << robot_info_data_.data_field_01);
+  ROS_INFO_STREAM(
+      "Robot Control GUI: data_field_01 = " << robot_info_data_.data_field_01);
 }
 
 void RobotGUI::odom_callback(
@@ -71,18 +71,78 @@ void RobotGUI::run() {
     // Create window at (40, 20) with size 250x80 (width x height) and title
     cvui::window(frame, 20, 20, 260, 225, "Robot information");
 
-    // Show the floating point number received
+    // Show the robot info (cvui-info)
     int y_step = 20, y_start = 45, info_color = 0xf0f0f0;
-    cvui::printf(frame, 25, y_start, 0.4, info_color, "%s", robot_info_data_.data_field_01.c_str());
-    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_02.c_str());
-    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_03.c_str());
-    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_04.c_str());
-    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_05.c_str());
-    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_06.c_str());
-    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_07.c_str());
-    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_08.c_str());
-    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_09.c_str());
-    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_10.c_str());
+    cvui::printf(frame, 25, y_start, 0.4, info_color, "%s",
+                 robot_info_data_.data_field_01.c_str());
+    cvui::printf(frame, 25, y_start += y_step, 0.4, info_color, "%s",
+                 robot_info_data_.data_field_02.c_str());
+    cvui::printf(frame, 25, y_start += y_step, 0.4, info_color, "%s",
+                 robot_info_data_.data_field_03.c_str());
+    cvui::printf(frame, 25, y_start += y_step, 0.4, info_color, "%s",
+                 robot_info_data_.data_field_04.c_str());
+    cvui::printf(frame, 25, y_start += y_step, 0.4, info_color, "%s",
+                 robot_info_data_.data_field_05.c_str());
+    cvui::printf(frame, 25, y_start += y_step, 0.4, info_color, "%s",
+                 robot_info_data_.data_field_06.c_str());
+    cvui::printf(frame, 25, y_start += y_step, 0.4, info_color, "%s",
+                 robot_info_data_.data_field_07.c_str());
+    cvui::printf(frame, 25, y_start += y_step, 0.4, info_color, "%s",
+                 robot_info_data_.data_field_08.c_str());
+    cvui::printf(frame, 25, y_start += y_step, 0.4, info_color, "%s",
+                 robot_info_data_.data_field_09.c_str());
+    cvui::printf(frame, 25, y_start += y_step, 0.4, info_color, "%s",
+                 robot_info_data_.data_field_10.c_str());
+
+    // Velocity teleoperation buttons (cvui-teleop)
+    // Show a button at position x = 100, y = 20
+    int origin_x = 0, origin_y = 250;
+    if (cvui::button(frame, origin_x + 100, origin_y + 20, " Forward ")) {
+      // The button was clicked, update the Twist message
+      twist_msg_.linear.x = twist_msg_.linear.x + linear_x_step_;
+      cmd_vel_pub_.publish(twist_msg_);
+    }
+
+    // Show a button at position x = 100, y = 50
+    if (cvui::button(frame, origin_x + 100, origin_y + 50, "   Stop  ")) {
+      // The button was clicked, update the Twist message
+      twist_msg_.linear.x = 0.0;
+      twist_msg_.angular.z = 0.0;
+      cmd_vel_pub_.publish(twist_msg_);
+    }
+
+    // Show a button at position x = 30, y = 50
+    if (cvui::button(frame, origin_x + 30, origin_y + 50, " Left ")) {
+      // The button was clicked, update the Twist message
+      twist_msg_.angular.z = twist_msg_.angular.z + angular_z_step_;
+      cmd_vel_pub_.publish(twist_msg_);
+    }
+
+    // Show a button at position x = 195, y = 50
+    if (cvui::button(frame, origin_x + 195, origin_y + 50, " Right ")) {
+      // The button was clicked, update the Twist message
+      twist_msg_.angular.z = twist_msg_.angular.z - angular_z_step_;
+      cmd_vel_pub_.publish(twist_msg_);
+    }
+
+    // Show a button at position x = 100, y = 80
+    if (cvui::button(frame, origin_x + 100, origin_y + 80, "Backward")) {
+      // The button was clicked,update the Twist message
+      twist_msg_.linear.x = twist_msg_.linear.x - linear_x_step_;
+      cmd_vel_pub_.publish(twist_msg_);
+    }
+
+    // // Create window at (320, 20) with size 120x40 (width x height) and title
+    // cvui::window(frame, 320, 20, 120, 40, "Linear velocity:");
+    // // Show the current velocity inside the window
+    // cvui::printf(frame, 345, 45, 0.4, 0xff0000, "%.02f m/sec",
+    //              twist_msg_.linear.x);
+
+    // // Create window at (320 60) with size 120x40 (width x height) and title
+    // cvui::window(frame, 320, 60, 120, 40, "Angular velocity:");
+    // // Show the current velocity inside the window
+    // cvui::printf(frame, 345, 85, 0.4, 0xff0000, "%.02f rad/sec",
+    //              twist_msg_.angular.z);
 
     // Update cvui internal stuff
     cvui::update();
