@@ -2,8 +2,6 @@
 #define ROBOT_GUI_H
 
 #include "ros/service_client.h"
-// #define CVUI_IMPLEMENTATION
-// #include "robot_gui/cvui.h"
 #include "robotinfo_msgs/RobotInfo10Fields.h"
 #include "std_srvs/Trigger.h"
 #include <nav_msgs/Odometry.h>
@@ -37,7 +35,7 @@ class RobotGUI {
     double distance_traveled_ = 0;
 
     // CVUI stuff
-    const std::string WINDOW_NAME = "MIR ROBOT CONTROL";
+    const std::string WINDOW_NAME = "MIR ROBOT CTRL";
 
     // callbacks are private
     void robot_info_callback(const robotinfo_msgs::RobotInfo10Fields::ConstPtr &robot_info_data);

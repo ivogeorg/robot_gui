@@ -1,6 +1,5 @@
 #include "robot_gui/robot_gui.h"
 #include "nav_msgs/Odometry.h"
-#include "robot_gui/cvui.h"
 #include "robotinfo_msgs/RobotInfo10Fields.h"
 #include <geometry_msgs/Twist.h>
 #include <ros/ros.h>
@@ -8,6 +7,8 @@
 
 #include "ros/init.h"
 #define CVUI_IMPLEMENTATION
+#include "robot_gui/cvui.h"
+
 
 #include <string>
 
@@ -40,6 +41,7 @@ void RobotGUI::robot_info_callback(
     const robotinfo_msgs::RobotInfo10Fields::ConstPtr &robot_info_data) {
   robot_info_data_ = *robot_info_data;
   ROS_INFO_STREAM("Robot Control GUI: received robot info data");
+  ROS_INFO_STREAM("Robot Control GUI: data_field_01 = " << robot_info_data_.data_field_01);
 }
 
 void RobotGUI::odom_callback(
@@ -49,25 +51,42 @@ void RobotGUI::odom_callback(
 }
 
 void RobotGUI::run() {
-  // Named window
+  cv::Mat frame = cv::Mat(900, 300, CV_8UC3);
 
-  // Frame
+  // Init a OpenCV window and tell cvui to use it.
+  cv::namedWindow(WINDOW_NAME);
+  cvui::init(WINDOW_NAME);
 
-  // while()
+  // while:
   //   Window: General info area
   //   Buttons: Teleoperation buttons
   //   Windows: Current velocity (linear, angular)
   //   Windows: Robot position (x, y, z)
   //   Buttons: Get/reset distance
   //   Window: Distance traveled
-  //
-  //   update
-  //   show
-  //   if (ESC) break
-  ros::Rate rate(10);
   while (ros::ok()) {
-    ROS_INFO_STREAM("Robot Control GUI: ran loop");    
+    // Fill the frame with a nice color
+    frame = cv::Scalar(49, 52, 49);
+
+    // Create window at (40, 20) with size 250x80 (width x height) and title
+    cvui::window(frame, 20, 20, 200, 400, "Robot information");
+
+    // Show the floating point number received
+    int y_step = 20, y_start = 45;
+    cvui::printf(frame, 25, y_start, 0.4, 0xff0000, "%s", robot_info_data_.data_field_01.c_str());
+    cvui::printf(frame, 25, y_start += y_step , 0.4, 0xff0000, "%s", robot_info_data_.data_field_02.c_str());
+
+    // Update cvui internal stuff
+    cvui::update();
+
+    // Show everything on the screen
+    cv::imshow(WINDOW_NAME, frame);
+
+    // Check if ESC key was pressed
+    if (cv::waitKey(20) == 27) {
+      break;
+    }
+    // Spin as a single-threaded node
     ros::spinOnce();
-    rate.sleep();
   }
 }
