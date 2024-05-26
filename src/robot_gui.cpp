@@ -69,12 +69,20 @@ void RobotGUI::run() {
     frame = cv::Scalar(49, 52, 49);
 
     // Create window at (40, 20) with size 250x80 (width x height) and title
-    cvui::window(frame, 20, 20, 200, 400, "Robot information");
+    cvui::window(frame, 20, 20, 260, 225, "Robot information");
 
     // Show the floating point number received
-    int y_step = 20, y_start = 45;
-    cvui::printf(frame, 25, y_start, 0.4, 0xff0000, "%s", robot_info_data_.data_field_01.c_str());
-    cvui::printf(frame, 25, y_start += y_step , 0.4, 0xff0000, "%s", robot_info_data_.data_field_02.c_str());
+    int y_step = 20, y_start = 45, info_color = 0xf0f0f0;
+    cvui::printf(frame, 25, y_start, 0.4, info_color, "%s", robot_info_data_.data_field_01.c_str());
+    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_02.c_str());
+    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_03.c_str());
+    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_04.c_str());
+    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_05.c_str());
+    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_06.c_str());
+    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_07.c_str());
+    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_08.c_str());
+    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_09.c_str());
+    cvui::printf(frame, 25, y_start += y_step , 0.4, info_color, "%s", robot_info_data_.data_field_10.c_str());
 
     // Update cvui internal stuff
     cvui::update();
