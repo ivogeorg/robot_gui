@@ -96,15 +96,15 @@ void RobotGUI::run() {
 
     // Velocity teleoperation buttons (cvui-teleop)
     // Show a button at position x = 100, y = 20
-    int origin_x = 0, origin_y = 250;
-    if (cvui::button(frame, origin_x + 100, origin_y + 20, " Forward ")) {
+    int origin_x = 5, origin_y = 255, btn_width = 90, btn_height = 70;
+    if (cvui::button(frame, origin_x + 100, origin_y + 0, btn_width, btn_height, " Forward ")) {
       // The button was clicked, update the Twist message
       twist_msg_.linear.x = twist_msg_.linear.x + linear_x_step_;
       cmd_vel_pub_.publish(twist_msg_);
     }
 
     // Show a button at position x = 100, y = 50
-    if (cvui::button(frame, origin_x + 100, origin_y + 50, "   Stop  ")) {
+    if (cvui::button(frame, origin_x + 100, origin_y + 75, btn_width, btn_height, "   Stop  ")) {
       // The button was clicked, update the Twist message
       twist_msg_.linear.x = 0.0;
       twist_msg_.angular.z = 0.0;
@@ -112,21 +112,21 @@ void RobotGUI::run() {
     }
 
     // Show a button at position x = 30, y = 50
-    if (cvui::button(frame, origin_x + 30, origin_y + 50, " Left ")) {
+    if (cvui::button(frame, origin_x + 5, origin_y + 75, btn_width, btn_height, " Left ")) {
       // The button was clicked, update the Twist message
       twist_msg_.angular.z = twist_msg_.angular.z + angular_z_step_;
       cmd_vel_pub_.publish(twist_msg_);
     }
 
     // Show a button at position x = 195, y = 50
-    if (cvui::button(frame, origin_x + 195, origin_y + 50, " Right ")) {
+    if (cvui::button(frame, origin_x + 195, origin_y + 75, btn_width, btn_height, " Right ")) {
       // The button was clicked, update the Twist message
       twist_msg_.angular.z = twist_msg_.angular.z - angular_z_step_;
       cmd_vel_pub_.publish(twist_msg_);
     }
 
     // Show a button at position x = 100, y = 80
-    if (cvui::button(frame, origin_x + 100, origin_y + 80, "Backward")) {
+    if (cvui::button(frame, origin_x + 100, origin_y + 150, btn_width, btn_height, "Backward")) {
       // The button was clicked,update the Twist message
       twist_msg_.linear.x = twist_msg_.linear.x - linear_x_step_;
       cmd_vel_pub_.publish(twist_msg_);
