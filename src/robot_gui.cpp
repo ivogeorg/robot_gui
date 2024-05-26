@@ -39,15 +39,13 @@ RobotGUI::RobotGUI(std::string into_topic, std::string odom_topic,
 void RobotGUI::robot_info_callback(
     const robotinfo_msgs::RobotInfo10Fields::ConstPtr &robot_info_data) {
   robot_info_data_ = *robot_info_data;
-  ROS_INFO_STREAM("Robot Control GUI: received robot info data");
-  ROS_INFO_STREAM(
-      "Robot Control GUI: data_field_01 = " << robot_info_data_.data_field_01);
+  ROS_DEBUG_STREAM("Robot Control GUI: received robot info data");
 }
 
 void RobotGUI::odom_callback(
     const nav_msgs::Odometry::ConstPtr &robot_odom_data) {
   odom_data_ = *robot_odom_data;
-  ROS_INFO_STREAM("Robot Control GUI: received robot odometry data");
+  ROS_DEBUG_STREAM("Robot Control GUI: received robot odometry data");
 }
 
 void RobotGUI::run() {
@@ -58,9 +56,6 @@ void RobotGUI::run() {
   cvui::init(WINDOW_NAME);
 
   // while:
-  //   Window: General info area (cvui-info)
-  //   Buttons: Teleoperation buttons (cvui-teleop)
-  //   Windows: Current velocity (linear, angular) (cvui-velocity)
   //   Windows: Robot position (x, y, z) (cvui-position)
   //   Buttons: Get/reset distance (cvui-distance-svc)
   //   Window: Distance traveled (cvui-distance-show)
@@ -95,54 +90,52 @@ void RobotGUI::run() {
                  robot_info_data_.data_field_10.c_str());
 
     // Velocity teleoperation buttons (cvui-teleop)
-    // Show a button at position x = 100, y = 20
     int origin_x = 5, origin_y = 255, btn_width = 90, btn_height = 70;
-    if (cvui::button(frame, origin_x + 100, origin_y + 0, btn_width, btn_height, " Forward ")) {
+    if (cvui::button(frame, origin_x + 100, origin_y + 0, btn_width, btn_height,
+                     " Forward ")) {
       // The button was clicked, update the Twist message
       twist_msg_.linear.x = twist_msg_.linear.x + linear_x_step_;
-      cmd_vel_pub_.publish(twist_msg_);
     }
 
-    // Show a button at position x = 100, y = 50
-    if (cvui::button(frame, origin_x + 100, origin_y + 75, btn_width, btn_height, "   Stop  ")) {
+    if (cvui::button(frame, origin_x + 100, origin_y + 75, btn_width,
+                     btn_height, "   Stop  ")) {
       // The button was clicked, update the Twist message
       twist_msg_.linear.x = 0.0;
       twist_msg_.angular.z = 0.0;
-      cmd_vel_pub_.publish(twist_msg_);
     }
 
-    // Show a button at position x = 30, y = 50
-    if (cvui::button(frame, origin_x + 5, origin_y + 75, btn_width, btn_height, " Left ")) {
+    if (cvui::button(frame, origin_x + 5, origin_y + 75, btn_width, btn_height,
+                     " Left ")) {
       // The button was clicked, update the Twist message
       twist_msg_.angular.z = twist_msg_.angular.z + angular_z_step_;
-      cmd_vel_pub_.publish(twist_msg_);
     }
 
-    // Show a button at position x = 195, y = 50
-    if (cvui::button(frame, origin_x + 195, origin_y + 75, btn_width, btn_height, " Right ")) {
+    if (cvui::button(frame, origin_x + 195, origin_y + 75, btn_width,
+                     btn_height, " Right ")) {
       // The button was clicked, update the Twist message
       twist_msg_.angular.z = twist_msg_.angular.z - angular_z_step_;
-      cmd_vel_pub_.publish(twist_msg_);
     }
 
-    // Show a button at position x = 100, y = 80
-    if (cvui::button(frame, origin_x + 100, origin_y + 150, btn_width, btn_height, "Backward")) {
+    if (cvui::button(frame, origin_x + 100, origin_y + 150, btn_width,
+                     btn_height, "Backward")) {
       // The button was clicked,update the Twist message
       twist_msg_.linear.x = twist_msg_.linear.x - linear_x_step_;
-      cmd_vel_pub_.publish(twist_msg_);
     }
+ 
+    // Publish velocity (topic /cmd_vel takes a Twist message)
+    cmd_vel_pub_.publish(twist_msg_);
 
-    // // Create window at (320, 20) with size 120x40 (width x height) and title
-    // cvui::window(frame, 320, 20, 120, 40, "Linear velocity:");
-    // // Show the current velocity inside the window
-    // cvui::printf(frame, 345, 45, 0.4, 0xff0000, "%.02f m/sec",
-    //              twist_msg_.linear.x);
+    // Current velocity (cvui-velocity)
+    int vel_color = 0xf0f0f0;
+    cvui::window(frame, 10, 485, 140, 40, "Linear velocity:");
+    // Show the current velocity inside the window
+    cvui::printf(frame, 25, 510, 0.4, vel_color, "%.02f m/sec",
+                 odom_data_.twist.twist.linear.x);
 
-    // // Create window at (320 60) with size 120x40 (width x height) and title
-    // cvui::window(frame, 320, 60, 120, 40, "Angular velocity:");
-    // // Show the current velocity inside the window
-    // cvui::printf(frame, 345, 85, 0.4, 0xff0000, "%.02f rad/sec",
-    //              twist_msg_.angular.z);
+    cvui::window(frame, 150, 485, 140, 40, "Angular velocity:");
+    // Show the current velocity inside the window
+    cvui::printf(frame, 165, 510, 0.4, vel_color, "%.02f rad/sec",
+                 odom_data_.twist.twist.angular.z);
 
     // Update cvui internal stuff
     cvui::update();
