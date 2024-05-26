@@ -55,9 +55,8 @@ void RobotGUI::run() {
   cv::namedWindow(WINDOW_NAME);
   cvui::init(WINDOW_NAME);
 
+  // Optional:
   // while:
-  //   Windows: Robot position (x, y, z) (cvui-position)
-  //   Buttons: Get/reset distance (cvui-distance-svc)
   //   Window: Distance traveled (cvui-distance-show)
   while (ros::ok()) {
     // Fill the frame with a nice color
@@ -121,7 +120,7 @@ void RobotGUI::run() {
       // The button was clicked,update the Twist message
       twist_msg_.linear.x = twist_msg_.linear.x - linear_x_step_;
     }
- 
+
     // Publish velocity (topic /cmd_vel takes a Twist message)
     cmd_vel_pub_.publish(twist_msg_);
 
@@ -141,20 +140,50 @@ void RobotGUI::run() {
     int pos_color = 0xf0f0f0;
     origin_x = 10;
     origin_y = 530;
-    cvui::printf(frame, origin_x, origin_y + 15, 0.36, pos_color, "Estimated robot position from odometry (m)");
+    cvui::printf(frame, origin_x, origin_y + 15, 0.36, pos_color,
+                 "Estimated robot position from odometry (m)");
     cvui::window(frame, origin_x, origin_y + 30, 90, 90, "X");
     // Print the x coordinate from odometry
     cvui::printf(frame, origin_x, origin_y + 90, 0.8, vel_color, "%*.02f", 6,
                  odom_data_.pose.pose.position.x);
     cvui::window(frame, origin_x + 95, origin_y + 30, 90, 90, "Y");
     // Print the y coordinate from odometry
-    cvui::printf(frame, origin_x + 90, origin_y + 90, 0.8, vel_color, "%*.02f", 6,
-                 odom_data_.pose.pose.position.y);
+    cvui::printf(frame, origin_x + 90, origin_y + 90, 0.8, vel_color, "%*.02f",
+                 6, odom_data_.pose.pose.position.y);
     cvui::window(frame, origin_x + 190, origin_y + 30, 90, 90, "Z");
     // Print the z coordinate from odometry
-    cvui::printf(frame, origin_x + 185, origin_y + 90, 0.8, vel_color, "%*.02f", 6,
-                 odom_data_.pose.pose.position.z);
+    cvui::printf(frame, origin_x + 185, origin_y + 90, 0.8, vel_color, "%*.02f",
+                 6, odom_data_.pose.pose.position.z);
 
+    // Call the distance service (cvui-get-distance)
+    int dist_color = 0xf0f0f0;
+    origin_x = 10;
+    origin_y = 670;
+
+    // Window to show the response from the service
+    cvui::window(frame, origin_x + 100, origin_y, 180, 90,
+                 "Distance traveled (m)");
+
+    if (cvui::button(frame, origin_x, origin_y, 90, 90, "Update")) {
+      // Send the request and wait for a response
+      if (get_distance_client_.call(svc_trigger_)) {
+        // Print the response message
+        ROS_DEBUG("/%s service response message: %s",
+                  get_distance_service_name_.c_str(),
+                  svc_trigger_.response.message.c_str());
+        // set latest service call status
+        last_distance_msg_ = svc_trigger_.response.message;
+      } else {
+        last_distance_msg_ =
+            "/" + get_distance_service_name_ + " service call failed.";
+      }
+    }
+
+    // Display the last response inside the window
+    if (not last_distance_msg_.empty()) {
+      cvui::printf(frame, origin_x + 180, origin_y + 60, 0.8, dist_color, "%*s",
+                   6, last_distance_msg_.c_str());
+    }
 
     // Update cvui internal stuff
     cvui::update();

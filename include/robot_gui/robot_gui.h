@@ -31,7 +31,7 @@ class RobotGUI {
   // to hold the data for subscribers
   robotinfo_msgs::RobotInfo10Fields robot_info_data_;
   nav_msgs::Odometry odom_data_;
-  double distance_traveled_ = 0;
+  std::string last_distance_msg_;
 
   // Teleop & velocities
   geometry_msgs::Twist twist_msg_;
