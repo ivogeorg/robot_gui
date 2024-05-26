@@ -58,12 +58,12 @@ void RobotGUI::run() {
   cvui::init(WINDOW_NAME);
 
   // while:
-  //   Window: General info area
-  //   Buttons: Teleoperation buttons
-  //   Windows: Current velocity (linear, angular)
-  //   Windows: Robot position (x, y, z)
-  //   Buttons: Get/reset distance
-  //   Window: Distance traveled
+  //   Window: General info area (cvui-info)
+  //   Buttons: Teleoperation buttons (cvui-teleop)
+  //   Windows: Current velocity (linear, angular) (cvui-velocity)
+  //   Windows: Robot position (x, y, z) (cvui-position)
+  //   Buttons: Get/reset distance (cvui-distance-svc)
+  //   Window: Distance traveled (cvui-distance-show)
   while (ros::ok()) {
     // Fill the frame with a nice color
     frame = cv::Scalar(49, 52, 49);
